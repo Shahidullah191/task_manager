@@ -39,3 +39,5 @@ final taskControllerProvider = StateNotifierProvider<TaskController, AsyncValue<
   final repo = ref.read(taskRepositoryProvider);
   return TaskController(repo);
 });
+
+final homeTabProvider = StateProvider<int>((ref) => 0);

@@ -14,8 +14,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  int tab = 0;
-
   @override
   Widget build(BuildContext context) {
     final tasksAsync = ref.watch(taskControllerProvider);
@@ -23,6 +21,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     final assigned = tasks.length;
     final completed = tasks.where((t) => t.status == 'complete').length;
+
+    final tab = ref.watch(homeTabProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -74,9 +74,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           active: tab == 0,
                           text: "All",
                           onTap: () {
-                            setState(() {
-                              tab = 0;
-                            });
+                            ref.read(homeTabProvider.notifier).state = 0;
                           },
                         )),
 
@@ -84,9 +82,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           active: tab == 1,
                           text: "Completed",
                           onTap: () {
-                            setState(() {
-                              tab = 1;
-                            });
+                            ref.read(homeTabProvider.notifier).state = 1;
                           },
                         )),
                       ],

@@ -22,22 +22,26 @@ class ViewTaskPage extends ConsumerStatefulWidget {
 }
 
 class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
-  late TextEditingController titleCtrl;
-  late TextEditingController descCtrl;
+  TextEditingController titleCtrl = TextEditingController();
+  TextEditingController descCtrl = TextEditingController();
   DateTime? startDate;
   DateTime? endDate;
 
   @override
   void initState() {
     super.initState();
-    titleCtrl = TextEditingController(text: widget.task.title);
-    descCtrl = TextEditingController(text: widget.task.description);
+    titleCtrl.text = widget.task.title;
+    descCtrl.text = widget.task.description;
     startDate = widget.task.startDate;
     endDate = widget.task.endDate;
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final taskState = ref.watch(taskViewProvider(widget.task));
+    final taskNotifier = ref.read(taskViewProvider(widget.task).notifier);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.bg,
@@ -55,8 +59,8 @@ class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
                   onDelete: () async {
                     if (widget.task.id != null) {
                       await ref.read(taskControllerProvider.notifier).remove(widget.task.id!);
-                      if (mounted) Navigator.pop(context);
-                      if (mounted) Navigator.pop(context);
+                      if (context.mounted) Navigator.pop(context);
+                      if (context.mounted) Navigator.pop(context);
                     }
                   },
                 );
@@ -85,6 +89,7 @@ class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
                 labelText: "Task Name",
                 hintText: "Enter Your Task Name",
                 controller: titleCtrl,
+                onChanged: taskNotifier.setTitle,
               ),
               const SizedBox(height: 10),
 
@@ -94,16 +99,8 @@ class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
                 controller: descCtrl,
                 maxLines: 5,
                 showCounter: true,
-                onChanged: (val) {
-                  //max 45 words
-                  setState(() {
-                    if (val.split(' ').length > 45) {
-                      final words = val.split(' ').sublist(0, 45).join(' ');
-                      descCtrl.text = words;
-                      descCtrl.selection = TextSelection.fromPosition(TextPosition(offset: words.length));
-                    }
-                  });
-                },
+                onChanged: taskNotifier.setDescription,
+                counterText: '${taskState.wordCount}',
               ),
               const SizedBox(height: 10),
 
@@ -113,9 +110,7 @@ class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
                     child: CustomDatePicker(
                       labelText: "Start Date",
                       selectedDate: startDate,
-                      onPicked: (value) {
-                        setState(()=> startDate = value);
-                      },
+                      onPicked: taskNotifier.setStartDate,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -124,9 +119,7 @@ class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
                     child: CustomDatePicker(
                       labelText: "End Date",
                       selectedDate: endDate,
-                      onPicked: (value) {
-                        setState(()=> endDate = value);
-                      },
+                      onPicked: taskNotifier.setEndDate,
                     ),
                   ),
                 ],
@@ -144,10 +137,9 @@ class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
                     status: 'complete',
                   );
                   await ref.read(taskControllerProvider.notifier).update(t);
-                  if (mounted) Navigator.pop(context);
+                  if (context.mounted) Navigator.pop(context);
                 },
               ),
-
 
             ],
           ),
@@ -186,3 +178,76 @@ class DeleteConfirmDialog extends StatelessWidget {
     );
   }
 }
+
+class TaskViewState {
+  final String title;
+  final String description;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final int wordCount;
+
+  const TaskViewState({
+    this.title = '',
+    this.description = '',
+    this.startDate,
+    this.endDate,
+    this.wordCount = 0,
+  });
+
+  TaskViewState copyWith({
+    String? title,
+    String? description,
+    DateTime? startDate,
+    DateTime? endDate,
+    int? wordCount,
+  }) {
+    return TaskViewState(
+      title: title ?? this.title,
+      description: description ?? this.description,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      wordCount: wordCount ?? this.wordCount,
+    );
+  }
+}
+
+class TaskViewNotifier extends StateNotifier<TaskViewState> {
+  TaskViewNotifier(Task task)
+      : super(TaskViewState(
+    title: task.title,
+    description: task.description,
+    startDate: task.startDate,
+    endDate: task.endDate,
+    wordCount: task.description.trim().isEmpty
+        ? 0
+        : task.description.trim().split(' ').length,
+  ));
+
+  void setTitle(String title) {
+    state = state.copyWith(title: title);
+  }
+
+  void setDescription(String desc) {
+    final words = desc.trim().split(' ');
+    if (words.length > 45) {
+      final limited = words.sublist(0, 45).join(' ');
+      state = state.copyWith(description: limited, wordCount: 45);
+    } else {
+      state = state.copyWith(description: desc, wordCount: words.length);
+    }
+  }
+
+  void setStartDate(DateTime? date) {
+    state = state.copyWith(startDate: date);
+  }
+
+  void setEndDate(DateTime? date) {
+    state = state.copyWith(endDate: date);
+  }
+}
+
+final taskViewProvider =
+StateNotifierProvider.family<TaskViewNotifier, TaskViewState, Task>(
+      (ref, task) => TaskViewNotifier(task),
+);
+

@@ -22,6 +22,7 @@ class CustomTextField extends StatelessWidget {
   final bool isRequired;
   final String labelText;
   final bool showCounter;
+  final String? counterText;
 
   const CustomTextField({
     super.key,
@@ -44,6 +45,7 @@ class CustomTextField extends StatelessWidget {
     this.isRequired = false,
     required this.labelText,
     this.showCounter = false,
+    this.counterText,
   });
 
   @override
@@ -86,7 +88,7 @@ class CustomTextField extends StatelessWidget {
           //max 45 words
           text: TextSpan(
             //by default 0/45
-            text: '${controller != null ? controller!.text.trim().split(' ').length : 0}',
+            text: counterText ?? '0',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve, color: AppColors.primary),
             children: [
               TextSpan(
@@ -108,3 +110,4 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+
