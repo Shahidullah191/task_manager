@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:razinsoft_task/app_theme.dart';
 import 'package:razinsoft_task/features/tasks/viewmodels/task_controller.dart';
 import 'package:razinsoft_task/features/tasks/views/widgets/task_card.dart';
+import 'package:razinsoft_task/helper/date_converter.dart';
 import 'package:razinsoft_task/utils/dimensions.dart';
-import 'package:razinsoft_task/utils/date_utils.dart' as du;
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -32,7 +32,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Good morning Liam!", style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve)),
-            Text(du.today(), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeSixteen)),
+            Text(DateConverter.today(), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeSixteen)),
           ],
         ),
       ),
@@ -66,12 +66,29 @@ class _HomePageState extends ConsumerState<HomePage> {
                     decoration: BoxDecoration(
                       color: AppColors.card,
                       borderRadius: BorderRadius.circular(Dimensions.radiusForty),
-                      border: Border.all(color: AppColors.gray.withValues(alpha: 0.2)),
+                      border: Border.all(color: AppColors.gray.withValues(alpha: 0.33)),
                     ),
                     child: Row(
                       children: [
-                        Expanded(child: _pill(true, "All tasks")),
-                        Expanded(child: _pill(false, "Completed")),
+                        Expanded(child: _taskButton(
+                          active: tab == 0,
+                          text: "All",
+                          onTap: () {
+                            setState(() {
+                              tab = 0;
+                            });
+                          },
+                        )),
+
+                        Expanded(child: _taskButton(
+                          active: tab == 1,
+                          text: "Completed",
+                          onTap: () {
+                            setState(() {
+                              tab = 1;
+                            });
+                          },
+                        )),
                       ],
                     ),
                   ),
@@ -82,9 +99,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           SliverPadding(
             padding: const EdgeInsets.only(left: Dimensions.paddingSizeTwenty, right: Dimensions.paddingSizeTwenty, top: Dimensions.paddingSizeTen),
             sliver: SliverList.separated(
-              itemBuilder: (_, i) => TaskCard(task: tasks[i]),
+              itemBuilder: (_, i) => TaskCard(task: tab == 0 ? tasks[i] : tasks.where((t) => t.status == 'complete').toList()[i]),
               separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemCount: tasks.length,
+              itemCount: tab == 0 ? assigned : completed,
             ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
@@ -115,14 +132,17 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _pill(bool active, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-      decoration: BoxDecoration(
-        color: active ? AppColors.primary : AppColors.card,
-        borderRadius: BorderRadius.circular(Dimensions.radiusForty),
+  Widget _taskButton({required bool active, required String text, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? AppColors.primary : AppColors.card,
+          borderRadius: BorderRadius.circular(Dimensions.radiusForty),
+        ),
+        child: Text(text, style: TextStyle(color: active ? Colors.white : AppColors.textMuted, fontWeight: active ? FontWeight.w700 : FontWeight.w500), textAlign: TextAlign.center),
       ),
-      child: Text(text, style: TextStyle(color: active ? Colors.white : AppColors.textMuted, fontWeight: active ? FontWeight.w700 : FontWeight.w500), textAlign: TextAlign.center),
     );
   }
 }

@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../app_theme.dart';
-import '../models/task.dart';
-import '../viewmodels/task_controller.dart';
+import 'package:go_router/go_router.dart';
+import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:razinsoft_task/app_theme.dart';
+import 'package:razinsoft_task/common/widgets/custom_button.dart';
+import 'package:razinsoft_task/common/widgets/custom_date_picker.dart';
+import 'package:razinsoft_task/common/widgets/custom_text_field.dart';
+import 'package:razinsoft_task/features/tasks/models/task.dart';
+import 'package:razinsoft_task/features/tasks/viewmodels/task_controller.dart';
 
 class ViewTaskPage extends ConsumerStatefulWidget {
+  static ViewTaskPage builder(BuildContext context, GoRouterState state) {
+    final task = state.extra as Task;
+    return ViewTaskPage(task: task);
+  }
   final Task task;
   const ViewTaskPage({super.key, required this.task});
 
@@ -31,100 +40,149 @@ class _ViewTaskPageState extends ConsumerState<ViewTaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("View Task"),
+        backgroundColor: AppColors.bg,
+        surfaceTintColor: AppColors.bg,
+        title: Text("View Task", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeEighteen)),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.error.withValues(alpha: 0.1),
+              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeFifteen),
+            ),
             onPressed: () async {
-              if (widget.task.id != null) {
-                await ref.read(taskControllerProvider.notifier).remove(widget.task.id!);
-                if (mounted) Navigator.pop(context);
-              }
+              showDialog(context: context, builder: (context) {
+                return DeleteConfirmDialog(
+                  onDelete: () async {
+                    if (widget.task.id != null) {
+                      await ref.read(taskControllerProvider.notifier).remove(widget.task.id!);
+                      if (mounted) Navigator.pop(context);
+                      if (mounted) Navigator.pop(context);
+                    }
+                  },
+                );
+              });
             },
-            child: const Text("Delete", style: TextStyle(color: AppColors.danger)),
-          )
+            child: Text("Delete", style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: Dimensions.fontSizeTwelve, color: AppColors.error)),
+          ),
+
+          const SizedBox(width: 20),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _label("Task Name"),
-            _input(titleCtrl, "Task Title"),
-            const SizedBox(height: 16),
-            _label("Task description"),
-            _input(descCtrl, "Description", maxLines: 5),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: _dateField(context, "Start Date", (d){ setState(()=> startDate = d); })),
-                const SizedBox(width: 12),
-                Expanded(child: _dateField(context, "End Date", (d){ setState(()=> endDate = d); })),
-              ],
-            ),
-            const Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-                    onPressed: () async {
-                      final t = widget.task.copyWith(
-                        title: titleCtrl.text.trim(),
-                        description: descCtrl.text.trim(),
-                        startDate: startDate,
-                        endDate: endDate,
-                        status: 'complete',
-                      );
-                      await ref.read(taskControllerProvider.notifier).update(t);
-                      if (mounted) Navigator.pop(context);
-                    },
-                    child: const Text("Complete"),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(Dimensions.paddingSizeFifteen),
+          margin: const EdgeInsets.symmetric(vertical: Dimensions.marginSizeTen),
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(Dimensions.radiusFifteen),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 12, offset: const Offset(0,6))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              CustomTextField(
+                labelText: "Task Name",
+                hintText: "Enter Your Task Name",
+                controller: titleCtrl,
+              ),
+              const SizedBox(height: 10),
+
+              CustomTextField(
+                labelText: "Task description",
+                hintText: "Description",
+                controller: descCtrl,
+                maxLines: 5,
+                showCounter: true,
+                onChanged: (val) {
+                  //max 45 words
+                  setState(() {
+                    if (val.split(' ').length > 45) {
+                      final words = val.split(' ').sublist(0, 45).join(' ');
+                      descCtrl.text = words;
+                      descCtrl.selection = TextSelection.fromPosition(TextPosition(offset: words.length));
+                    }
+                  });
+                },
+              ),
+              const SizedBox(height: 10),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomDatePicker(
+                      labelText: "Start Date",
+                      selectedDate: startDate,
+                      onPicked: (value) {
+                        setState(()=> startDate = value);
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: CustomDatePicker(
+                      labelText: "End Date",
+                      selectedDate: endDate,
+                      onPicked: (value) {
+                        setState(()=> endDate = value);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+
+              CustomButton(
+                text: "Complete",
+                onTap: () async {
+                  final t = widget.task.copyWith(
+                    title: titleCtrl.text.trim(),
+                    description: descCtrl.text.trim(),
+                    startDate: startDate,
+                    endDate: endDate,
+                    status: 'complete',
+                  );
+                  await ref.read(taskControllerProvider.notifier).update(t);
+                  if (mounted) Navigator.pop(context);
+                },
+              ),
+
+
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _label(String t) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Text(t, style: Theme.of(context).textTheme.titleMedium),
-  );
+class DeleteConfirmDialog extends StatelessWidget {
+  final VoidCallback onDelete;
+  const DeleteConfirmDialog({super.key, required this.onDelete});
 
-  Widget _input(TextEditingController c, String hint, {int maxLines = 1}) {
-    return TextField(
-      controller: c,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-      ),
-    );
-  }
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Delete Task"),
+      content: const Text("Are you sure you want to delete this task? This action cannot be undone."),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          child: const Text("Cancel"),
+        ),
 
-  Widget _dateField(BuildContext context, String label, ValueChanged<DateTime?> onPicked) {
-    return TextField(
-      readOnly: true,
-      onTap: () async {
-        final now = DateTime.now();
-        final d = await showDatePicker(context: context, firstDate: DateTime(now.year-1), lastDate: DateTime(now.year+5), initialDate: now);
-        onPicked(d);
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon: const Icon(Icons.calendar_month),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-      ),
+        TextButton(
+          onPressed: onDelete,
+          style: TextButton.styleFrom(
+            backgroundColor: AppColors.error.withValues(alpha: 0.1),
+            foregroundColor: AppColors.error,
+          ),
+          child: const Text("Delete"),
+        ),
+      ],
     );
   }
 }

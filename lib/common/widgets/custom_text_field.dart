@@ -21,6 +21,7 @@ class CustomTextField extends StatelessWidget {
   final bool showTitle;
   final bool isRequired;
   final String labelText;
+  final bool showCounter;
 
   const CustomTextField({
     super.key,
@@ -42,6 +43,7 @@ class CustomTextField extends StatelessWidget {
     this.showTitle = true,
     this.isRequired = false,
     required this.labelText,
+    this.showCounter = false,
   });
 
   @override
@@ -76,6 +78,25 @@ class CustomTextField extends StatelessWidget {
         validator: validator,
         autovalidateMode: autoValidateMode,
       ),
+      SizedBox(height: showCounter ? Dimensions.paddingSizeTen : 0),
+
+      showCounter ? Align(
+        alignment: Alignment.centerRight,
+        child: RichText(
+          //max 45 words
+          text: TextSpan(
+            //by default 0/45
+            text: '${controller != null ? controller!.text.trim().split(' ').length : 0}',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve, color: AppColors.primary),
+            children: [
+              TextSpan(
+                text: '/45',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve, color: AppColors.textMuted),
+              ),
+            ],
+          ),
+        ),
+      ) : const SizedBox(),
 
     ]);
   }

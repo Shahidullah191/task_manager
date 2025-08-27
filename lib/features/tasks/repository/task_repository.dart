@@ -8,7 +8,7 @@ class TaskRepository {
     final db = await _dbProvider.database;
     final maps = await db.query('tasks', orderBy: 'id DESC');
     return maps.map((m) => Task.fromMap(m)).toList();
-    }
+  }
 
   Future<int> insert(Task task) async {
     final db = await _dbProvider.database;

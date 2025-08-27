@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:razinsoft_task/app_theme.dart';
 import 'package:razinsoft_task/features/tasks/models/task.dart';
 import 'package:razinsoft_task/features/tasks/views/view_task_page.dart';
-import 'package:razinsoft_task/utils/date_utils.dart' as du;
+import 'package:razinsoft_task/helper/date_converter.dart';
 import 'package:razinsoft_task/utils/dimensions.dart';
 
 class TaskCard extends StatelessWidget {
@@ -23,6 +23,7 @@ class TaskCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(Dimensions.radiusTen),
+          border: Border.all(color: AppColors.gray.withValues(alpha: 0.33)),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 12, offset: const Offset(0,6))],
         ),
         child: Column(
@@ -45,7 +46,7 @@ class TaskCard extends StatelessWidget {
                 const Icon(Icons.timer_outlined, size: 16, color: AppColors.text),
                 const SizedBox(width: 8),
 
-                Text(du.formatDate(task.endDate), style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve)),
+                Text(DateConverter.formatDate(task.endDate!), style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve)),
                 const Spacer(),
 
                 Container(

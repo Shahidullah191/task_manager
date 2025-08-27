@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/features/dashboard/views/dashboard_page.dart';
+import 'package:razinsoft_task/routes/routes_location.dart';
 
 class SplashPage extends StatefulWidget {
+  static SplashPage builder(BuildContext context, GoRouterState state) => const SplashPage();
   const SplashPage({super.key});
 
   @override
@@ -35,12 +37,8 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     _controller.forward();
 
-    // Go to DashboardPage after 3 seconds
     Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const DashboardPage()),
-      );
+      context.pushReplacement(RouteLocation.dashboard);
     });
   }
 

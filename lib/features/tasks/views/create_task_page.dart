@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:razinsoft_task/app_theme.dart';
 import 'package:razinsoft_task/common/widgets/custom_button.dart';
+import 'package:razinsoft_task/common/widgets/custom_date_picker.dart';
 import 'package:razinsoft_task/common/widgets/custom_text_field.dart';
 import 'package:razinsoft_task/features/dashboard/views/dashboard_page.dart';
 import 'package:razinsoft_task/features/tasks/models/task.dart';
@@ -54,16 +55,45 @@ class _CreateTaskPageState extends ConsumerState<CreateTaskPage> {
                 hintText: "Description",
                 controller: descCtrl,
                 maxLines: 5,
+                showCounter: true,
+                onChanged: (val) {
+                  //max 45 words
+                  setState(() {
+                    if (val.split(' ').length > 45) {
+                      final words = val.split(' ').sublist(0, 45).join(' ');
+                      descCtrl.text = words;
+                      descCtrl.selection = TextSelection.fromPosition(TextPosition(offset: words.length));
+                    }
+                  });
+                },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+
               Row(
                 children: [
-                  Expanded(child: _dateField(context, "Start Date", (d){ setState(()=> startDate = d); })),
+                  Expanded(
+                    child: CustomDatePicker(
+                      labelText: "Start Date",
+                      selectedDate: startDate,
+                      onPicked: (value) {
+                        setState(()=> startDate = value);
+                      },
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _dateField(context, "End Date", (d){ setState(()=> endDate = d); })),
+
+                  Expanded(
+                    child: CustomDatePicker(
+                      labelText: "End Date",
+                      selectedDate: endDate,
+                      onPicked: (value) {
+                        setState(()=> endDate = value);
+                      },
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 40),
 
               CustomButton(
                 text: "Create new tasks",
@@ -87,44 +117,6 @@ class _CreateTaskPageState extends ConsumerState<CreateTaskPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _label(String label) => Padding(
-    padding: const EdgeInsets.only(bottom: 5),
-    child: Text(label, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeFourteen)),
-  );
-
-  Widget _input(TextEditingController c, String hint, {int maxLines = 1}) {
-    return TextField(
-      controller: c,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
-  }
-
-  Widget _dateField(BuildContext context, String label, ValueChanged<DateTime?> onPicked) {
-    return TextField(
-      readOnly: true,
-      onTap: () async {
-        final now = DateTime.now();
-        final d = await showDatePicker(context: context, firstDate: DateTime(now.year-1), lastDate: DateTime(now.year+5), initialDate: now);
-        onPicked(d);
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon: const Icon(Icons.calendar_month),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }

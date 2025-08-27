@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:razinsoft_task/common/widgets/custom_app_bar.dart';
+import 'package:razinsoft_task/utils/dimensions.dart';
 import '../../../app_theme.dart';
 import '../viewmodels/task_controller.dart';
 import 'create_task_page.dart';
@@ -15,28 +17,35 @@ class AllTasksPage extends ConsumerWidget {
     final tasks = tasksAsync.asData?.value ?? [];
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.bg,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: const Text("All Task"),
-        actions: [
+      appBar: CustomAppBar(
+        title: "All Task",
+        actionWidget: Row(children: [
           TextButton(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateTaskPage())),
-            child: const Text("Create New"),
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeFifteen),
+            ),
+            onPressed: () async {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateTaskPage()));
+            },
+            child: Text("Create New", style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: Dimensions.fontSizeTwelve, color: AppColors.primary)),
           ),
-          const SizedBox(width: 12),
-        ],
+
+          const SizedBox(width: 20),
+        ]),
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          SizedBox(height: Dimensions.paddingSizeFifteen),
+
           const DateChipsRow(),
+
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: tasks.length,
+            child: ListView.separated(
+              padding: const EdgeInsets.only(left: Dimensions.paddingSizeTwenty, right: Dimensions.paddingSizeTwenty, top: Dimensions.paddingSizeTen),
               itemBuilder: (_, i) => TaskCard(task: tasks[i]),
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemCount: tasks.length,
             ),
           ),
         ],
