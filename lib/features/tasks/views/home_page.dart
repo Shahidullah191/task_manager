@@ -92,12 +92,18 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
             ),
           ),
-          SliverPadding(
+
+          tasks.isNotEmpty ? SliverPadding(
             padding: const EdgeInsets.only(left: Dimensions.paddingSizeTwenty, right: Dimensions.paddingSizeTwenty, top: Dimensions.paddingSizeTen),
             sliver: SliverList.separated(
               itemBuilder: (_, i) => TaskCard(task: tab == 0 ? tasks[i] : tasks.where((t) => t.status == 'complete').toList()[i]),
               separatorBuilder: (_, __) => const SizedBox(height: 10),
               itemCount: tab == 0 ? assigned : completed,
+            ),
+          ) : SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Text("No tasks available", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted)),
             ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
