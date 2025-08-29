@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/routes/routes_location.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/routes/routes_location.dart';
 
 class SplashPage extends StatefulWidget {
-  static SplashPage builder(BuildContext context, GoRouterState state) => const SplashPage();
   const SplashPage({super.key});
 
   @override
@@ -38,7 +37,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     _controller.forward();
 
     Timer(const Duration(seconds: 3), () {
-      context.pushReplacement(RouteLocation.dashboard);
+      context.go(RouteLocation.getDashboardPage());
     });
   }
 

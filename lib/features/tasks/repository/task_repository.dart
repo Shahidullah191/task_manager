@@ -1,5 +1,5 @@
-import 'package:razinsoft_task/core/db/app_database.dart';
-import 'package:razinsoft_task/features/tasks/models/task.dart';
+import 'package:task_manager/core/db/app_database.dart';
+import 'package:task_manager/features/tasks/models/task.dart';
 
 class TaskRepository {
   final AppDatabase _dbProvider = AppDatabase();

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/features/tasks/viewmodels/task_controller.dart';
-import 'package:razinsoft_task/features/tasks/views/widgets/task_card.dart';
-import 'package:razinsoft_task/helper/date_converter.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/features/tasks/viewmodels/task_controller.dart';
+import 'package:task_manager/features/tasks/views/widgets/task_card.dart';
+import 'package:task_manager/helper/date_converter.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -28,6 +28,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       appBar: AppBar(
         backgroundColor: AppColors.bg,
         surfaceTintColor: AppColors.bg,
+        automaticallyImplyLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -106,7 +107,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Text("No tasks available", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted)),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
         ],
       ),
     );

@@ -1,34 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/common/widgets/custom_button.dart';
-import 'package:razinsoft_task/common/widgets/custom_date_picker.dart';
-import 'package:razinsoft_task/common/widgets/custom_snackbar.dart';
-import 'package:razinsoft_task/common/widgets/custom_text_field.dart';
-import 'package:razinsoft_task/features/tasks/models/task.dart';
-import 'package:razinsoft_task/features/tasks/viewmodels/task_controller.dart';
-import 'package:razinsoft_task/routes/routes_location.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/common/widgets/custom_app_bar.dart';
+import 'package:task_manager/common/widgets/custom_button.dart';
+import 'package:task_manager/common/widgets/custom_date_picker.dart';
+import 'package:task_manager/common/widgets/custom_snackbar.dart';
+import 'package:task_manager/common/widgets/custom_text_field.dart';
+import 'package:task_manager/features/tasks/models/task.dart';
+import 'package:task_manager/features/tasks/viewmodels/task_controller.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
-class CreateTaskPage extends ConsumerWidget {
+class CreateTaskPage extends ConsumerStatefulWidget {
   const CreateTaskPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CreateTaskPage> createState() => _CreateTaskPageState();
+}
+
+class _CreateTaskPageState extends ConsumerState<CreateTaskPage> {
+
+  TextEditingController titleCtrl = TextEditingController();
+  TextEditingController descCtrl = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+
     final taskState = ref.watch(createTaskProvider);
     final taskNotifier = ref.read(createTaskProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.bg,
-        surfaceTintColor: AppColors.bg,
-        title: Text(
-          "Create new task",
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontSize: Dimensions.fontSizeEighteen,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: "Create new task",
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -51,19 +53,20 @@ class CreateTaskPage extends ConsumerWidget {
               CustomTextField(
                 labelText: "Task Name",
                 hintText: "Enter Your Task Name",
-                controller: TextEditingController(text: taskState.title),
-                onChanged: taskNotifier.setTitle,
+                controller: titleCtrl,
+                inputAction: TextInputAction.next,
               ),
               const SizedBox(height: 10),
 
               CustomTextField(
                 labelText: "Task description",
                 hintText: "Description",
-                controller: TextEditingController(text: taskState.description),
+                controller: descCtrl,
                 maxLines: 5,
                 showCounter: true,
                 counterText: "${taskState.wordCount}",
                 onChanged: taskNotifier.setDescription,
+                inputAction: TextInputAction.done,
               ),
               const SizedBox(height: 10),
 
@@ -95,9 +98,13 @@ class CreateTaskPage extends ConsumerWidget {
               CustomButton(
                 text: "Create new tasks",
                 onTap: () async {
-                  if (taskState.title.isEmpty) {
+
+                  String title = titleCtrl.text.trim();
+                  String description = descCtrl.text.trim();
+
+                  if (title.isEmpty) {
                     showCustomSnackBar('Enter your task name');
-                  } else if (taskState.description.isEmpty) {
+                  } else if (description.isEmpty) {
                     showCustomSnackBar('Enter your task description');
                   } else if (taskState.startDate == null) {
                     showCustomSnackBar('Select start date');
@@ -106,18 +113,20 @@ class CreateTaskPage extends ConsumerWidget {
                   } else if (taskState.endDate!.isBefore(taskState.startDate!)) {
                     showCustomSnackBar('End date must be after start date');
                   } else {
-                    final router = GoRouter.of(context);
                     await ref.read(taskControllerProvider.notifier).add(
                       Task(
-                        title: taskState.title,
+                        title: title,
                         description: taskState.description,
                         startDate: taskState.startDate,
                         endDate: taskState.endDate ?? DateTime.now(),
                         status: 'todo',
                       ),
-                    );
-                    ref.read(createTaskProvider.notifier).reset();
-                    router.pushReplacement(RouteLocation.dashboard);
+                    ).then((value) {
+                      titleCtrl.clear();
+                      descCtrl.clear();
+                      ref.read(createTaskProvider.notifier).reset();
+                      showCustomSnackBar('Task created successfully', isError: false);
+                    });
                   }
                 },
               ),
@@ -142,9 +151,7 @@ class CreateTaskState {
     this.endDate,
   });
 
-  int get wordCount => description.trim().isEmpty
-      ? 0
-      : description.trim().split(RegExp(r'\s+')).length;
+  int get wordCount => description.trim().isEmpty ? 0 : description.trim().split(RegExp(r'\s+')).length;
 
   CreateTaskState copyWith({
     String? title,
@@ -164,12 +171,7 @@ class CreateTaskState {
 class CreateTaskNotifier extends StateNotifier<CreateTaskState> {
   CreateTaskNotifier() : super(const CreateTaskState());
 
-  void setTitle(String val) {
-    state = state.copyWith(title: val);
-  }
-
   void setDescription(String val) {
-    // enforce max 45 words
     final words = val.trim().split(RegExp(r'\s+'));
     final truncated = words.length > 45 ? words.sublist(0, 45).join(' ') : val;
     state = state.copyWith(description: truncated);

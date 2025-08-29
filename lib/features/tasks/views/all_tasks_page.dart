@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:razinsoft_task/common/widgets/custom_app_bar.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
-import '../../../app_theme.dart';
-import '../viewmodels/task_controller.dart';
-import 'create_task_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/common/widgets/custom_app_bar.dart';
+import 'package:task_manager/features/tasks/viewmodels/task_controller.dart';
+import 'package:task_manager/routes/routes_location.dart';
+import 'package:task_manager/utils/dimensions.dart';
 import 'widgets/date_chips_row.dart';
 import 'widgets/task_card.dart';
 
@@ -19,6 +20,7 @@ class AllTasksPage extends ConsumerWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: "All Task",
+        automaticallyImplyLeading: false,
         actionWidget: Row(children: [
           TextButton(
             style: TextButton.styleFrom(
@@ -26,7 +28,7 @@ class AllTasksPage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeFifteen),
             ),
             onPressed: () async {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateTaskPage()));
+              GoRouter.of(context).push(RouteLocation.getCreateTaskPage());
             },
             child: Text("Create New", style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: Dimensions.fontSizeTwelve, color: AppColors.primary)),
           ),

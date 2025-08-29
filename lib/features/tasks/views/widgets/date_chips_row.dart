@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
 class DateChipsRow extends StatefulWidget {
   const DateChipsRow({super.key});
@@ -26,10 +26,7 @@ class _DateChipsRowState extends State<DateChipsRow> {
     days = List.generate(7, (i) => DateTime.now().subtract(Duration(days: 3 - i)));
 
     // Find today's index
-    selected = days.indexWhere((d) =>
-    d.year == DateTime.now().year &&
-        d.month == DateTime.now().month &&
-        d.day == DateTime.now().day);
+    selected = days.indexWhere((d) => d.year == DateTime.now().year && d.month == DateTime.now().month && d.day == DateTime.now().day);
 
     // Center today after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,8 +62,6 @@ class _DateChipsRowState extends State<DateChipsRow> {
     _scrollController.jumpTo(offset);
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -92,13 +87,11 @@ class _DateChipsRowState extends State<DateChipsRow> {
             decoration: BoxDecoration(
               color: isSel ? AppColors.primary : AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(Dimensions.radiusFifteen),
-              gradient: isSel
-                  ? LinearGradient(
+              gradient: isSel ? LinearGradient(
                 colors: [const Color(0xff886CED), AppColors.primary],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-              )
-                  : null,
+              ) : null,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

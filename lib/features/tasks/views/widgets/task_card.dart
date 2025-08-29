@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/features/tasks/models/task.dart';
-import 'package:razinsoft_task/features/tasks/views/view_task_page.dart';
-import 'package:razinsoft_task/helper/date_converter.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:go_router/go_router.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/features/tasks/models/task.dart';
+import 'package:task_manager/helper/date_converter.dart';
+import 'package:task_manager/routes/routes_location.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -16,7 +17,7 @@ class TaskCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => ViewTaskPage(task: task)));
+        GoRouter.of(context).push(RouteLocation.getViewTaskPage(task));
       },
       child: Container(
         padding: const EdgeInsets.all(Dimensions.paddingSizeTen),

@@ -1,4 +1,4 @@
-name: razinsoft_task
+name: task_manager
 description: A pixel-perfect task manager with Riverpod, SQLite and MVVM.
 publish_to: "none"
 version: 1.0.0+1
@@ -13,7 +13,7 @@ dependencies:
   sqflite: ^2.4.2
   path: ^1.9.1
   intl: ^0.20.2
-  google_fonts: ^6.3.0
+  google_fonts: ^6.3.1
   fluttertoast: ^8.2.12
   go_router: ^16.2.0
 
@@ -24,5 +24,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/

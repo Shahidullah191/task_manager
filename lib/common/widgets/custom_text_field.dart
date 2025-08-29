@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
 class CustomTextField extends StatelessWidget {
   final String? hintText;
@@ -23,6 +23,7 @@ class CustomTextField extends StatelessWidget {
   final String labelText;
   final bool showCounter;
   final String? counterText;
+  final bool isEnabled;
 
   const CustomTextField({
     super.key,
@@ -46,6 +47,7 @@ class CustomTextField extends StatelessWidget {
     required this.labelText,
     this.showCounter = false,
     this.counterText,
+    this.isEnabled = true,
   });
 
   @override
@@ -63,6 +65,7 @@ class CustomTextField extends StatelessWidget {
         keyboardType: inputType,
         textInputAction: inputAction,
         maxLines: maxLines,
+        enabled: isEnabled,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve),
         decoration: InputDecoration(
           hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve),
@@ -85,9 +88,7 @@ class CustomTextField extends StatelessWidget {
       showCounter ? Align(
         alignment: Alignment.centerRight,
         child: RichText(
-          //max 45 words
           text: TextSpan(
-            //by default 0/45
             text: counterText ?? '0',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve, color: AppColors.primary),
             children: [

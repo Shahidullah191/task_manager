@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
 class CustomButton extends StatelessWidget {
   final double? height;

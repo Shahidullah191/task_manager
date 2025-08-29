@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/helper/date_converter.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/helper/date_converter.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
 class CustomDatePicker extends StatelessWidget {
   final String labelText;
@@ -38,9 +38,12 @@ class CustomDatePicker extends StatelessWidget {
             border: Border.all(color: AppColors.bg),
           ),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text(
-              selectedDate != null ? DateConverter.formatDate(selectedDate!) : "Select Date",
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve),
+            Expanded(
+              child: Text(
+                selectedDate != null ? DateConverter.formatDate(selectedDate!) : "Select Date",
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: Dimensions.fontSizeTwelve),
+                overflow: TextOverflow.ellipsis, maxLines: 1,
+              ),
             ),
 
             const Icon(Icons.calendar_month_outlined, color: AppColors.primary),

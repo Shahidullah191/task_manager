@@ -2,16 +2,14 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-import 'package:razinsoft_task/app_theme.dart';
-import 'package:razinsoft_task/features/tasks/views/all_tasks_page.dart';
-import 'package:razinsoft_task/features/tasks/views/create_task_page.dart';
-import 'package:razinsoft_task/features/tasks/views/home_page.dart';
-import 'package:razinsoft_task/features/dashboard/views/widgets/bottom_nav.dart';
-import 'package:razinsoft_task/utils/dimensions.dart';
+import 'package:task_manager/app_theme.dart';
+import 'package:task_manager/features/tasks/views/all_tasks_page.dart';
+import 'package:task_manager/features/tasks/views/create_task_page.dart';
+import 'package:task_manager/features/tasks/views/home_page.dart';
+import 'package:task_manager/features/dashboard/views/widgets/bottom_nav.dart';
+import 'package:task_manager/utils/dimensions.dart';
 
 class DashboardPage extends StatefulWidget {
-  static DashboardPage builder(BuildContext context, GoRouterState state) => const DashboardPage();
   const DashboardPage({super.key});
 
   @override
